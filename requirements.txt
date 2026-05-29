@@ -1,0 +1,7 @@
+markdownify>=0.13.1
+beautifulsoup4>=4.12.0
+tiktoken>=0.7.0
+openai>=1.40.0
+python-dotenv>=1.0.0
+psycopg[binary]>=3.2.0
+psycopg-pool>=3.2.0
