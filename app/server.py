@@ -17,9 +17,13 @@ from mcp.server.transport_security import TransportSecuritySettings
 from openai import OpenAI
 from psycopg_pool import ConnectionPool
 from pydantic import Field
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import HTMLResponse
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
+
+LANDING_HTML = (Path(__file__).resolve().parent / "landing.html").read_text()
 
 EMBED_MODEL = "text-embedding-3-small"
 MAX_QUERY_CHARS = 1000
@@ -288,7 +292,25 @@ def list_recent(
     ]
 
 
+class BrowserLandingMiddleware(BaseHTTPMiddleware):
+    """Serve a help page when a browser hits /mcp.
+
+    Real MCP clients send `Accept: text/event-stream`. Browsers send
+    `Accept: text/html,...` and otherwise get a cryptic JSON-RPC error
+    ("Not Acceptable: Client must accept text/event-stream"). Intercept
+    those and return setup instructions instead.
+    """
+
+    async def dispatch(self, request, call_next):
+        if request.method == "GET" and request.url.path.rstrip("/") == "/mcp":
+            accept = request.headers.get("accept", "")
+            if "text/event-stream" not in accept and "text/html" in accept:
+                return HTMLResponse(LANDING_HTML)
+        return await call_next(request)
+
+
 app = mcp.streamable_http_app()
+app.add_middleware(BrowserLandingMiddleware)
 
 
 if __name__ == "__main__":

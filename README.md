@@ -9,9 +9,26 @@ you find the right idea instead of the whole post.
 
 ## Use it
 
-Add this URL as a custom connector in Claude (web, desktop, or Code):
+Don't open the URL in a browser — it's an MCP endpoint, not a web page.
+Add it as a custom connector in your AI client instead:
 
     https://yoni.fyi/mcp
+
+**Claude.ai (web or desktop):** Settings → Connectors → Add custom
+connector. Paste the URL.
+
+**Claude Code:**
+
+```bash
+claude mcp add --transport http ask-yoni https://yoni.fyi/mcp
+```
+
+**Cursor:** Settings → MCP → Add new MCP server → HTTP transport, paste
+the URL.
+
+If you do hit `https://yoni.fyi/mcp` in a browser, you'll get a setup page
+with the same instructions and a copy button — the MCP protocol itself is
+unchanged.
 
 It exposes four tools:
 

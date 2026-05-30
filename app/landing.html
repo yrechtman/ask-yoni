@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ask-yoni — MCP server for 99% Derisible</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Public Model Context Protocol server for semantic search over Yoni Rechtman's newsletter 99% Derisible.">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --bg: #ffffff;
+      --border: #e5e5e5;
+      --accent: #b45309;
+      --code-bg: #f6f5f1;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #ececec;
+        --muted: #9a9a9a;
+        --bg: #111111;
+        --border: #2a2a2a;
+        --accent: #fbbf24;
+        --code-bg: #1a1a1a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 6rem;
+    }
+    h1 { font-size: 1.75rem; margin: 0 0 .25rem; font-weight: 600; }
+    h2 { font-size: 1.05rem; margin: 2.25rem 0 .5rem; font-weight: 600; }
+    p { margin: .75rem 0; }
+    .lede { color: var(--muted); margin-top: 0; }
+    .notice {
+      border-left: 3px solid var(--accent);
+      padding: .75rem 1rem;
+      background: var(--code-bg);
+      margin: 1.5rem 0;
+      font-size: .95rem;
+    }
+    .url-box {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .65rem .75rem;
+      margin: .75rem 0 1.5rem;
+    }
+    .url-box code {
+      flex: 1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .95rem;
+      overflow: auto;
+      white-space: nowrap;
+    }
+    button {
+      font: inherit;
+      font-size: .8rem;
+      padding: .3rem .65rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .65rem .85rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .82rem;
+      overflow-x: auto;
+      margin: .5rem 0;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+    a { color: var(--accent); }
+    ul { padding-left: 1.25rem; margin: .5rem 0; }
+    li { margin: .2rem 0; }
+    .client { margin: 1.25rem 0; }
+    .client-name { font-weight: 600; margin-bottom: .25rem; }
+    .footer { color: var(--muted); font-size: .85rem; margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>ask-yoni</h1>
+  <p class="lede">A public MCP server for semantic search over <a href="https://99d.substack.com">99% Derisible</a>, Yoni Rechtman's newsletter on early-stage VC.</p>
+
+  <div class="notice">
+    <strong>You aren't supposed to open this URL in a browser.</strong> It's a Model Context Protocol endpoint — add it to your AI client as a connector and ask questions about Yoni's writing through that.
+  </div>
+
+  <h2>The URL</h2>
+  <div class="url-box">
+    <code id="mcp-url">https://yoni.fyi/mcp</code>
+    <button id="copy-btn" type="button">copy</button>
+  </div>
+
+  <h2>Set it up</h2>
+
+  <div class="client">
+    <div class="client-name">Claude.ai (web or desktop)</div>
+    <p>Settings → Connectors → Add custom connector. Paste the URL above. Name it whatever you like.</p>
+  </div>
+
+  <div class="client">
+    <div class="client-name">Claude Code</div>
+<pre>claude mcp add --transport http ask-yoni https://yoni.fyi/mcp</pre>
+  </div>
+
+  <div class="client">
+    <div class="client-name">Cursor</div>
+    <p>Settings → MCP → Add new MCP server → choose HTTP transport, paste the URL.</p>
+  </div>
+
+  <h2>What it does</h2>
+  <p>It exposes four tools to your AI client:</p>
+  <ul>
+    <li><code>search_99d</code> — semantic search at the section level</li>
+    <li><code>get_post</code> — fetch a full Substack issue by slug</li>
+    <li><code>get_section</code> — fetch one section of an issue</li>
+    <li><code>list_recent</code> — list the most recent issues</li>
+  </ul>
+  <p>Once it's connected, try asking your AI things like <em>"what does Yoni think about AI services companies?"</em>, <em>"narrative warfare in VC"</em>, or <em>"how should I think about seed pricing?"</em></p>
+
+  <div class="footer">
+    Source: <a href="https://github.com/yrechtman/ask-yoni">github.com/yrechtman/ask-yoni</a> · Newsletter: <a href="https://99d.substack.com">99d.substack.com</a>
+  </div>
+
+  <script>
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      const btn = this;
+      const url = document.getElementById("mcp-url").textContent.trim();
+      navigator.clipboard.writeText(url).then(function () {
+        btn.textContent = "copied";
+        setTimeout(function () { btn.textContent = "copy"; }, 1500);
+      }).catch(function () {
+        btn.textContent = "press ⌘C";
+      });
+    });
+  </script>
+</body>
+</html>
