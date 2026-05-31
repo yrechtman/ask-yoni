@@ -156,6 +156,8 @@ ssh slow-claude-core 'cd /root/ask-yoni-local && git pull && systemctl restart a
 
 The sync cron picks up code changes via `git pull --ff-only origin main` in `sync-droplet.sh`, but it does **not** auto-restart the running uvicorn. After server-code (`app/`) changes, restart explicitly.
 
+**Never commit on the droplet.** All changes flow Mac → GitHub → droplet. The droplet's clone has a `.git/hooks/pre-commit` that refuses commits — this exists because the droplet's clone once accumulated 11 local-only commits that never reached GitHub and caused a deploy to wedge with "Diverging branches can't be fast-forwarded." If you ever need to bypass the hook (e.g. one-off hotfix you can't push from elsewhere), commit on the Mac and push instead — there is essentially no legitimate reason to author commits on the droplet.
+
 ### Check sync health
 
 ```bash
